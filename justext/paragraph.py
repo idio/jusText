@@ -22,6 +22,12 @@ class Paragraph(object):
         return bool(re.search(r"\bh\d\b", self.dom_path))
 
     @property
+    def heading_size(self):
+        if self.is_heading:
+            return int(re.search(r"\bh(\d)\b", self.dom_path).group(1))
+        return None
+
+    @property
     def is_boilerplate(self):
         return self.class_type != "good"
 
