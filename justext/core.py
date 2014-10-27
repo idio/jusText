@@ -356,6 +356,25 @@ def revise_paragraph_classification(paragraphs, max_heading_distance=MAX_HEADING
             distance += len(paragraphs[j].text)
             j += 1
 
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+ 
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+ 
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+ 
+    return previous_row[-1]
 
 def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
         length_high=LENGTH_HIGH_DEFAULT, stopwords_low=STOPWORDS_LOW_DEFAULT,
@@ -377,3 +396,59 @@ def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
     revise_paragraph_classification(paragraphs, max_heading_distance)
 
     return paragraphs
+
+
+def justitle(html_text, paragraphs):
+    title=re.search('<title>(.*?)</title>', html_text, flags=re.M|re.S)
+    if title:
+        title = title.group(1).strip()
+
+    superparagraphs=[]
+    current_superpar={"boilerplate": False, "length":0}
+    longest_superparagraph=(0, 0)
+    
+    # TODO: merge two meaningful superparagraphs that are close enough to each other
+    for paragraph in paragraphs:
+        if current_superpar["length"] == 0:    
+            current_superpar["boilerplate"]=paragraph.is_boilerplate
+
+        if paragraph.is_boilerplate != current_superpar["boilerplate"]:
+            superparagraphs.append(current_superpar)
+            current_superpar={"boilerplate": paragraph.is_boilerplate, "length":0}
+
+    
+        if not paragraph.is_heading:
+            current_superpar["length"]+=len(paragraph.text)
+            if not current_superpar["boilerplate"]:
+                if longest_superparagraph[0] < current_superpar["length"]:
+                    longest_superparagraph=(current_superpar["length"], len(superparagraphs)) 
+
+        else:
+            if current_superpar["length"] > 0:
+                superparagraphs.append(current_superpar)
+            
+            current_superpar={"boilerplate": False, "length":0}
+            superparagraphs.append({"size": -paragraph.heading_size, "text": paragraph.text})
+
+    biggest_heading=None
+
+    # we compare all headings before longest non-boilerplate superparagraph
+    for i in range(longest_superparagraph[1]):
+        supp=superparagraphs[i]
+        if "size" in supp:
+            if biggest_heading==None:
+                biggest_heading=supp
+            else:
+                if biggest_heading["size"] < supp["size"]:
+                    biggest_heading=supp
+                elif biggest_heading["size"] == supp["size"]:
+                    if title!=None:
+                        if levenshtein(supp["text"], title) < levenshtein(biggest_heading["text"], title):
+                            biggest_heading=supp
+    
+    # if there are no <h*> tags on page, fallback to contents of <title>
+    if not biggest_heading:
+        return title
+    
+    return biggest_heading["text"]
+
