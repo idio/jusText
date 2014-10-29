@@ -111,4 +111,4 @@ Acknowledgements
 
 This software has been developed at the `Natural Language Processing Centre`_ of
 `Masaryk University in Brno`_ with a financial support from PRESEMT_ and
-`Lexical Computing Ltd.`_ It also relates to `PhD research`_ of Jan Pomikálek.
+`Lexical Computing Ltd.`_ It also relates to `PhD research`_ of Jan Pomikalek.
