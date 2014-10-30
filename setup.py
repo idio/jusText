@@ -31,7 +31,9 @@ setup(
     url="https://github.com/miso-belica/jusText",
     license="The BSD 2-Clause License",
     install_requires=[
-        "lxml>=2.2.4",
+        # lxml lxml>=2.2.4 should work 
+        # in order to avoid compiling the newest lxml we locked it to 3.3.3
+        "lxml==3.3.3",
     ],
     tests_require=[
         "nose",
