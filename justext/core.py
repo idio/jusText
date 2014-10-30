@@ -376,7 +376,22 @@ def levenshtein(s1, s2):
  
     return previous_row[-1]
 
-def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
+def get_title(input_html):
+    
+    if isinstance(input_html, str):
+        title=re.search('<title>(.*?)</title>', input_html, flags=re.M|re.S)
+        if title:
+            title = title.group(1).strip()
+    elif isinstance(input_html, lxml.html.HtmlElement):
+        title = input_html.xpath("//title")
+        if title:
+            title = title[0]
+    else:
+        title = None
+
+    return title
+
+def justext(html_input, stoplist, length_low=LENGTH_LOW_DEFAULT,
         length_high=LENGTH_HIGH_DEFAULT, stopwords_low=STOPWORDS_LOW_DEFAULT,
         stopwords_high=STOPWORDS_HIGH_DEFAULT, max_link_density=MAX_LINK_DENSITY_DEFAULT,
         max_heading_distance=MAX_HEADING_DISTANCE_DEFAULT, no_headings=NO_HEADINGS_DEFAULT,
@@ -386,8 +401,11 @@ def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
     Converts an HTML page into a list of classified paragraphs. Each paragraph
     is represented as instance of class ˙˙justext.paragraph.Paragraph˙˙.
     """
-    dom = html_to_dom(html_text, default_encoding, encoding, enc_errors)
-    dom = preprocessor(dom)
+    if isinstance(html_input, str):
+        dom = html_to_dom(html_input, default_encoding, encoding, enc_errors)
+        dom = preprocessor(dom)
+    elif isinstance(html_input, lxml.html.HtmlElement):
+        dom = html_input
 
     paragraphs = ParagraphMaker.make_paragraphs(dom)
 
@@ -398,10 +416,9 @@ def justext(html_text, stoplist, length_low=LENGTH_LOW_DEFAULT,
     return paragraphs
 
 
-def justitle(html_text, paragraphs):
-    title=re.search('<title>(.*?)</title>', html_text, flags=re.M|re.S)
-    if title:
-        title = title.group(1).strip()
+def justitle(input_html, paragraphs):
+
+    title = get_title(input_html)
 
     superparagraphs=[]
     current_superpar={"boilerplate": False, "length":0}
