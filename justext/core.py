@@ -385,7 +385,7 @@ def get_title(input_html):
     elif isinstance(input_html, lxml.html.HtmlElement):
         title = input_html.xpath("//title")
         if title:
-            title = title[0]
+            title = title[0].text
     else:
         title = None
 
