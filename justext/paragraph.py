@@ -22,6 +22,19 @@ class Paragraph(object):
         return bool(re.search(r"\bh\d\b", self.dom_path))
 
     @property
+    def is_list_item(self):
+        return bool(re.search(r"li$", self.dom_path))
+
+    @property
+    def list_type(self):
+        if self.is_list_item:
+            if re.search(r"ul\.li$", self.dom_path):
+                return "ul"
+            else:
+                return "ol"
+        return None
+
+    @property
     def heading_size(self):
         if self.is_heading:
             return int(re.search(r"\bh(\d)\b", self.dom_path).group(1))
