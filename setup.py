@@ -33,7 +33,7 @@ setup(
     install_requires=[
         # lxml lxml>=2.2.4 should work 
         # in order to avoid compiling the newest lxml we locked it to 3.3.3
-        "lxml==3.3.3-1",
+        "lxml==3.3.3",
     ],
     tests_require=[
         "nose",
