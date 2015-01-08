@@ -48,6 +48,9 @@ class JustextError(Exception):
 class JustextInvalidOptions(JustextError):
     pass
 
+class JustextMalformedInput(JustextError):
+    pass
+
 
 def html_to_dom(html, default_encoding=DEFAULT_ENCODING, encoding=None, errors=DEFAULT_ENC_ERRORS):
     """Converts HTML to DOM."""
@@ -402,10 +405,12 @@ def justext(html_input, stoplist, length_low=LENGTH_LOW_DEFAULT,
     is represented as instance of class ˙˙justext.paragraph.Paragraph˙˙.
     """
     if isinstance(html_input, str):
-        dom = html_to_dom(html_input, default_encoding, encoding, enc_errors)
-        dom = preprocessor(dom)
-    elif isinstance(html_input, lxml.html.HtmlElement):
-        dom = preprocessor(html_input)
+       html_input = html_to_dom(html_input, default_encoding, encoding, enc_errors)
+    
+    if not isinstance(html_input, lxml.html.HtmlElement):
+        raise JustextMalformedInput("Input to justext was neither string nor DOM tree")
+
+    dom = preprocessor(html_input)
 
     paragraphs = ParagraphMaker.make_paragraphs(dom)
 
