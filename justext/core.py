@@ -405,7 +405,7 @@ def justext(html_input, stoplist, length_low=LENGTH_LOW_DEFAULT,
         dom = html_to_dom(html_input, default_encoding, encoding, enc_errors)
         dom = preprocessor(dom)
     elif isinstance(html_input, lxml.html.HtmlElement):
-        dom = html_input
+        dom = preprocessor(html_input)
 
     paragraphs = ParagraphMaker.make_paragraphs(dom)
 
