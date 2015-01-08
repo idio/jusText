@@ -3,6 +3,11 @@
 Changelog for jusText
 =====================
 
+2.1.3 (2014-01-08)
+------------------
+- *BUG FIX:* preprocessing doesn't happen when a dom tree is supplied to jusText.
+
+
 2.?.? (2014-??-??)
 ------------------
 - *INCOMPATIBLE CHANGE:* Stop words are case insensitive.
