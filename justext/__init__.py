@@ -8,7 +8,7 @@ This software is licensed as described in the file LICENSE.rst.
 
 from __future__ import absolute_import
 
-from .core import justext, get_stoplists, get_stoplist, justitle
+from .core import justext, get_stoplists, get_stoplist, justitle, ParagraphMaker
 
 
 __version__ = "2.1.3"
